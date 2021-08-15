@@ -16,14 +16,14 @@ public class RasterScan implements GLEventListener {
 
     public static void main(String[] args) {
         JFrame frame = new JFrame();
-        frame.setSize(Scene.SIZE.WIDTH, Scene.SIZE.HEIGHT);
+        frame.setSize(1000, 1000);
         frame.setVisible(true);
         frame.setResizable(false);
         frame.setLocationRelativeTo(null);
 
         GLCanvas canvas = new GLCanvas();
         canvas.addGLEventListener(new RasterScan());
-        canvas.setBounds(0, 0, Scene.SIZE.WIDTH, Scene.SIZE.HEIGHT);
+        canvas.setBounds(0, 0, 1000, 1000);
 
         canvas.addMouseListener(new MouseListener() {
             @Override
@@ -71,24 +71,18 @@ public class RasterScan implements GLEventListener {
         GL2 gl = drawable.getGL().getGL2();
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
-        gl.glOrthof(0, Scene.SIZE.WIDTH, Scene.SIZE.HEIGHT, 0, 0, 1);
-        gl.glClearColor(Scene.COLOR.R, Scene.COLOR.G, Scene.COLOR.B, Scene.COLOR.A);
-
-        scene = new Scene();
-        scene.drawables.add(new Grid());
-        scene.drawables.add(new Polygon());
+        scene = new Scene(drawable);
     }
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+        GL2 gl = drawable.getGL().getGL2();
+        gl.glOrthof(0, width, height, 0, 0, 1);
     }
 
     public void display(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-
-        for (Drawable d : scene.drawables) {
-            d.draw(drawable);
-        }
+        scene.draw(drawable);
     }
 
     public void dispose(GLAutoDrawable glAutoDrawable) {

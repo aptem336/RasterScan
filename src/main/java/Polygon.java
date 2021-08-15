@@ -2,34 +2,44 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 
 import java.awt.*;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Polygon implements Drawable {
-    private static final float POINT_SIZE = 5.0F;
     public static final List<Point> POINTS = new ArrayList<>();
+    private static float[] colors;
+
+    public Polygon(GLAutoDrawable drawable) {
+        colors = new float[drawable.getSurfaceWidth() * drawable.getSurfaceHeight() * 4];
+    }
+
+    private float[] getColor(int offset) {
+        float[] color = new float[4];
+        System.arraycopy(colors, offset, color, 0, 4);
+        return color;
+    }
+
+    public void setColor(float[] color, int offset) {
+        System.arraycopy(color, 0, colors, offset, 4);
+    }
 
     @Override
     public void draw(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();
-
-        gl.glColor4f(COLOR.R, COLOR.G, COLOR.B, COLOR.A);
-        gl.glBegin(GL2.GL_LINE_STRIP);
-        for (Point point : POINTS) {
-            gl.glVertex2i(point.x, point.y);
+        for (int i = 0; i < colors.length; i += 4) {
+            setColor(getColor(), i);
         }
-        gl.glEnd();
 
-        if (!POINTS.isEmpty()) {
-            gl.glPointSize(POINT_SIZE);
-            gl.glBegin(GL2.GL_POINTS);
-            gl.glVertex2i(POINTS.get(POINTS.size() - 1).x,
-                    POINTS.get(POINTS.size() - 1).y);
-            gl.glEnd();
-        }
+        gl.glDrawPixels(drawable.getSurfaceWidth(), drawable.getSurfaceHeight(), GL2.GL_RGBA, GL2.GL_FLOAT, FloatBuffer.wrap(colors));
     }
 
-    private static class COLOR {
+    @Override
+    public float[] getColor() {
+        return new float[]{1.0F, 0.0F, 0.0F, 1.0F};
+    }
+
+    public static class COLOR {
         private static final float R = 1.0F;
         private static final float G = 1.0F;
         private static final float B = 1.0F;
