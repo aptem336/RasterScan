@@ -5,6 +5,7 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.Animator;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
@@ -35,10 +36,13 @@ public class RasterScan implements GLEventListener {
 
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
+                int X_ROUNDER = 20;
+                int Y_ROUNDER = 20;
                 if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
-                    INPUT.MOUSE.RELEASED.EVENTS.add(mouseEvent);
+                    Polygon.POINTS.add(new Point(mouseEvent.getX() - mouseEvent.getX() % X_ROUNDER + X_ROUNDER / 2,
+                            mouseEvent.getY() - mouseEvent.getY() % Y_ROUNDER + Y_ROUNDER / 2));
                 } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
-                    INPUT.MOUSE.RELEASED.EVENTS.clear();
+                    Polygon.POINTS.clear();
                 }
             }
 
@@ -85,8 +89,6 @@ public class RasterScan implements GLEventListener {
         for (Drawable d : scene.drawables) {
             d.draw(drawable);
         }
-
-
     }
 
     public void dispose(GLAutoDrawable glAutoDrawable) {
