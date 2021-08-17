@@ -17,13 +17,12 @@ import java.util.List;
 
 public class RasterScan implements GLEventListener {
 
-    private static final Dimension size = new Dimension(1000, 1000);
     private static final List<Point> points = new ArrayList<>();
     private static float[] pixels;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame();
-        frame.setSize(size);
+        frame.setSize(1000, 100);
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
 
