@@ -8,7 +8,7 @@ public class Scene implements Drawable {
     final List<Drawable> drawables = new ArrayList<>();
 
     public Scene(GLAutoDrawable drawable) {
-        drawables.add(new Polygon(drawable, this));
+        drawables.add(new Polygon(drawable));
         drawables.add(new Grid(drawable));
     }
 

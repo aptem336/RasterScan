@@ -10,10 +10,8 @@ import java.util.List;
 public class Polygon implements Drawable {
     public static final List<Point> POINTS = new ArrayList<>();
     public static float[] colors;
-    private final Scene scene;
 
-    public Polygon(GLAutoDrawable drawable, Scene scene) {
-        this.scene = scene;
+    public Polygon(GLAutoDrawable drawable) {
         colors = new float[drawable.getSurfaceWidth() * drawable.getSurfaceHeight() * 4];
     }
 
