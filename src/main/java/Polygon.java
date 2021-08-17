@@ -9,8 +9,10 @@ import java.util.List;
 public class Polygon implements Drawable {
     public static final List<Point> POINTS = new ArrayList<>();
     private static float[] colors;
+    private final Scene scene;
 
-    public Polygon(GLAutoDrawable drawable) {
+    public Polygon(GLAutoDrawable drawable, Scene scene) {
+        this.scene = scene;
         colors = new float[drawable.getSurfaceWidth() * drawable.getSurfaceHeight() * 4];
     }
 
@@ -27,8 +29,28 @@ public class Polygon implements Drawable {
     @Override
     public void draw(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();
-        for (int i = 0; i < colors.length; i += 4) {
-            setColor(getColor(), i);
+        for (int i = 0; i < POINTS.size(); i++) {
+            Point a = POINTS.get(i);
+            Point b = POINTS.get((i + 1) % POINTS.size());
+            if (a.y > b.y) {
+                a = POINTS.get((i + 1) % POINTS.size());
+                b = POINTS.get(i);
+            }
+            for (int y = a.y; y < b.y; y++) {
+                int startX = a.x + ((y - a.y) * (b.x - a.x)) / (b.y - a.y);
+                for (int x = startX; x < drawable.getSurfaceWidth(); x++) {
+                    int offset = (drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 4 + x * 4;
+                    float[] color = getColor(offset);
+                    if (color[0] == getColor()[0]
+                            && color[1] == getColor()[1]
+                            && color[2] == getColor()[2]
+                            && color[3] == getColor()[3]) {
+                        setColor(scene.getColor(), offset);
+                    } else {
+                        setColor(getColor(), offset);
+                    }
+                }
+            }
         }
 
         gl.glDrawPixels(drawable.getSurfaceWidth(), drawable.getSurfaceHeight(), GL2.GL_RGBA, GL2.GL_FLOAT, FloatBuffer.wrap(colors));
@@ -36,13 +58,6 @@ public class Polygon implements Drawable {
 
     @Override
     public float[] getColor() {
-        return new float[]{1.0F, 0.0F, 0.0F, 1.0F};
-    }
-
-    public static class COLOR {
-        private static final float R = 1.0F;
-        private static final float G = 1.0F;
-        private static final float B = 1.0F;
-        private static final float A = 1.0F;
+        return new float[]{1.0F, 1.0F, 1.0F, 1.0F};
     }
 }
