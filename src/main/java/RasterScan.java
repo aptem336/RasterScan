@@ -18,7 +18,7 @@ import java.util.List;
 public class RasterScan implements GLEventListener, MouseListener {
 
     private final List<Point> points = new ArrayList<>();
-    //Q framebuffer?
+    //TODO framebuffer?
     private float[] pixels;
 
     public static void main(String[] args) {
@@ -61,7 +61,7 @@ public class RasterScan implements GLEventListener, MouseListener {
         for (int i = 0; i < points.size(); i++) {
             Point a = points.get(i);
             Point b = points.get((i + 1) % points.size());
-            //Q
+            //TODO optimize?
             if (a.y > b.y) {
                 a = points.get((i + 1) % points.size());
                 b = points.get(i);
@@ -82,6 +82,7 @@ public class RasterScan implements GLEventListener, MouseListener {
     }
 
     private void invertColor(int offset) {
+        //TODO extract colors
         if (pixels[offset] == 1.0F && pixels[offset + 1] == 1.0F && pixels[offset + 2] == 1.0F) {
             System.arraycopy(new float[]{0.15F, 0.15F, 0.15F}, 0, pixels, offset, 3);
         } else {
