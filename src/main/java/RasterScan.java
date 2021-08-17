@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
 
 public class RasterScan implements GLEventListener {
     private Scene scene;
@@ -41,8 +42,10 @@ public class RasterScan implements GLEventListener {
                 if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
                     Polygon.POINTS.add(new Point(mouseEvent.getX() - mouseEvent.getX() % X_ROUNDER + X_ROUNDER / 2,
                             mouseEvent.getY() - mouseEvent.getY() % Y_ROUNDER + Y_ROUNDER / 2));
+                    Arrays.fill(Polygon.colors, 0.0F);
                 } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
                     Polygon.POINTS.clear();
+                    Arrays.fill(Polygon.colors, 0.0F);
                 }
             }
 

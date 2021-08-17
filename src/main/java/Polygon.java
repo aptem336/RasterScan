@@ -4,11 +4,12 @@ import com.jogamp.opengl.GLAutoDrawable;
 import java.awt.*;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Polygon implements Drawable {
     public static final List<Point> POINTS = new ArrayList<>();
-    private static float[] colors;
+    public static float[] colors;
     private final Scene scene;
 
     public Polygon(GLAutoDrawable drawable, Scene scene) {
@@ -29,6 +30,7 @@ public class Polygon implements Drawable {
     @Override
     public void draw(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();
+        Arrays.fill(Polygon.colors, 0.0F);
         for (int i = 0; i < POINTS.size(); i++) {
             Point a = POINTS.get(i);
             Point b = POINTS.get((i + 1) % POINTS.size());
@@ -45,7 +47,7 @@ public class Polygon implements Drawable {
                             && color[1] == getColor()[1]
                             && color[2] == getColor()[2]
                             && color[3] == getColor()[3]) {
-                        setColor(scene.getColor(), offset);
+                        setColor(new float[]{0.0F, 0.0F, 0.0F, 0.0F}, offset);
                     } else {
                         setColor(getColor(), offset);
                     }
