@@ -15,48 +15,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class RasterScan implements GLEventListener {
+public class RasterScan implements GLEventListener, MouseListener {
 
-    private static final List<Point> points = new ArrayList<>();
-    private static float[] pixels;
+    private final List<Point> points = new ArrayList<>();
+    private float[] pixels;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         frame.setSize(1000, 1000);
-        frame.setVisible(true);
         frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
 
         GLCanvas canvas = new GLCanvas();
-        canvas.addGLEventListener(new RasterScan());
         canvas.setSize(frame.getSize());
         canvas.setLocation(0, 0);
 
-        canvas.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
-            }
+        RasterScan rasterScan = new RasterScan();
+        canvas.addGLEventListener(rasterScan);
+        canvas.addMouseListener(rasterScan);
 
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent mouseEvent) {
-                if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
-                    points.add(mouseEvent.getPoint());
-                } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
-                    points.clear();
-                }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-            }
-        });
         frame.add(canvas);
         final Animator animator = new Animator(canvas);
         frame.addWindowListener(new WindowAdapter() {
@@ -109,5 +86,30 @@ public class RasterScan implements GLEventListener {
         } else {
             System.arraycopy(new float[]{1.0F, 1.0F, 1.0F}, 0, pixels, offset, 3);
         }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent mouseEvent) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent mouseEvent) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent mouseEvent) {
+        if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
+            points.add(mouseEvent.getPoint());
+        } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
+            points.clear();
+        }
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent mouseEvent) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent mouseEvent) {
     }
 }
