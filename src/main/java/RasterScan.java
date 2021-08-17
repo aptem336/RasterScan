@@ -72,10 +72,6 @@ public class RasterScan implements GLEventListener {
     }
 
     public void init(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2();
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
-        pixels = new float[drawable.getSurfaceWidth() * drawable.getSurfaceHeight() * 3];
     }
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
@@ -85,9 +81,8 @@ public class RasterScan implements GLEventListener {
     }
 
     public void display(GLAutoDrawable drawable) {
-        GL2 gl = drawable.getGL().getGL2();
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-        Arrays.fill(RasterScan.pixels, 0.15F);
+        //Q framebuffer?
+        Arrays.fill(pixels, 0.15F);
         for (int i = 0; i < points.size(); i++) {
             Point a = points.get(i);
             Point b = points.get((i + 1) % points.size());
@@ -109,8 +104,9 @@ public class RasterScan implements GLEventListener {
                 }
             }
         }
+        GL2 gl = drawable.getGL().getGL2();
         gl.glDrawPixels(drawable.getSurfaceWidth(), drawable.getSurfaceHeight(), GL2.GL_RGB, GL2.GL_FLOAT, FloatBuffer.wrap(pixels));
-        //Q
+        //Q by pixels?
         if (!points.isEmpty()) {
             gl.glPointSize(10.0F);
             gl.glBegin(GL2.GL_POINTS);
@@ -126,12 +122,12 @@ public class RasterScan implements GLEventListener {
 
     private float[] getPixel(int offset) {
         float[] color = new float[3];
-        System.arraycopy(RasterScan.pixels, offset, color, 0, 3);
+        System.arraycopy(pixels, offset, color, 0, 3);
         return color;
     }
 
     public void setPixel(float[] color, int offset) {
-        System.arraycopy(color, 0, RasterScan.pixels, offset, 3);
+        System.arraycopy(color, 0, pixels, offset, 3);
     }
 
 }
