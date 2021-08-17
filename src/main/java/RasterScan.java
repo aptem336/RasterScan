@@ -110,6 +110,13 @@ public class RasterScan implements GLEventListener {
             }
         }
         gl.glDrawPixels(drawable.getSurfaceWidth(), drawable.getSurfaceHeight(), GL2.GL_RGBA, GL2.GL_FLOAT, FloatBuffer.wrap(RasterScan.colors));
+        if (!POINTS.isEmpty()) {
+            gl.glPointSize(10.0F);
+            gl.glBegin(GL2.GL_POINTS);
+            gl.glColor4f(1.0F, 0.0F, 0.0F, 1.0F);
+            gl.glVertex2i(POINTS.get(POINTS.size() - 1).x, POINTS.get(POINTS.size() - 1).y);
+            gl.glEnd();
+        }
     }
 
 
