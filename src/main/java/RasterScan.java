@@ -22,7 +22,7 @@ public class RasterScan implements GLEventListener {
 
     public static void main(String[] args) {
         JFrame frame = new JFrame();
-        frame.setSize(1000, 100);
+        frame.setSize(1000, 1000);
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
 
@@ -89,15 +89,9 @@ public class RasterScan implements GLEventListener {
                 b = points.get(i);
             }
             for (int y = a.y; y < b.y; y++) {
-                int startX = a.x + ((y - a.y) * (b.x - a.x)) / (b.y - a.y);
-                for (int x = startX; x < drawable.getSurfaceWidth(); x++) {
-                    int offset = (drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 3 + x * 3;
-                    float[] color = getPixel(offset);
-                    if (color[0] == 1.0F && color[1] == 1.0F && color[2] == 1.0F) {
-                        setPixel(new float[]{0.15F, 0.15F, 0.15F}, offset);
-                    } else {
-                        setPixel(new float[]{1.0F, 1.0F, 1.0F}, offset);
-                    }
+                int x = a.x + ((y - a.y) * (b.x - a.x)) / (b.y - a.y);
+                for (int j = x; j < drawable.getSurfaceWidth(); j++) {
+                    invertColor((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 3 + j * 3);
                 }
             }
         }
@@ -109,14 +103,11 @@ public class RasterScan implements GLEventListener {
     public void dispose(GLAutoDrawable glAutoDrawable) {
     }
 
-    private float[] getPixel(int offset) {
-        float[] color = new float[3];
-        System.arraycopy(pixels, offset, color, 0, 3);
-        return color;
+    private void invertColor(int offset) {
+        if (pixels[offset] == 1.0F && pixels[offset + 1] == 1.0F && pixels[offset + 2] == 1.0F) {
+            System.arraycopy(new float[]{0.15F, 0.15F, 0.15F}, 0, pixels, offset, 3);
+        } else {
+            System.arraycopy(new float[]{1.0F, 1.0F, 1.0F}, 0, pixels, offset, 3);
+        }
     }
-
-    public void setPixel(float[] color, int offset) {
-        System.arraycopy(color, 0, pixels, offset, 3);
-    }
-
 }
