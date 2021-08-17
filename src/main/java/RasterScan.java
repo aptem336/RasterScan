@@ -17,7 +17,7 @@ import java.util.List;
 
 public class RasterScan implements GLEventListener {
 
-    private static final List<Point> POINTS = new ArrayList<>();
+    private static final List<Point> points = new ArrayList<>();
     private static float[] colors;
 
     public static void main(String[] args) {
@@ -43,11 +43,11 @@ public class RasterScan implements GLEventListener {
             @Override
             public void mouseReleased(MouseEvent mouseEvent) {
                 if (mouseEvent.getButton() == MouseEvent.BUTTON1) {
-                    POINTS.add(mouseEvent.getPoint());
-                    Arrays.fill(colors, 0.0F);
+                    points.add(mouseEvent.getPoint());
+                    Arrays.fill(colors, 0.15F);
                 } else if (mouseEvent.getButton() == MouseEvent.BUTTON3) {
-                    POINTS.clear();
-                    Arrays.fill(colors, 0.0F);
+                    points.clear();
+                    Arrays.fill(colors, 0.15F);
                 }
             }
 
@@ -87,14 +87,13 @@ public class RasterScan implements GLEventListener {
     public void display(GLAutoDrawable drawable) {
         GL2 gl = drawable.getGL().getGL2();
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-        gl.glClearColor(0.15F, 0.15F, 0.15F, 0.15F);
-        Arrays.fill(RasterScan.colors, 0.0F);
-        for (int i = 0; i < POINTS.size(); i++) {
-            Point a = POINTS.get(i);
-            Point b = POINTS.get((i + 1) % POINTS.size());
+        Arrays.fill(RasterScan.colors, 0.15F);
+        for (int i = 0; i < points.size(); i++) {
+            Point a = points.get(i);
+            Point b = points.get((i + 1) % points.size());
             if (a.y > b.y) {
-                a = POINTS.get((i + 1) % POINTS.size());
-                b = POINTS.get(i);
+                a = points.get((i + 1) % points.size());
+                b = points.get(i);
             }
             for (int y = a.y; y < b.y; y++) {
                 int startX = a.x + ((y - a.y) * (b.x - a.x)) / (b.y - a.y);
@@ -102,7 +101,7 @@ public class RasterScan implements GLEventListener {
                     int offset = (drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 4 + x * 4;
                     float[] color = getColor(offset);
                     if (color[0] == 1.0F && color[1] == 1.0F && color[2] == 1.0F && color[3] == 1.0F) {
-                        setColor(new float[]{0.0F, 0.0F, 0.0F, 0.0F}, offset);
+                        setColor(new float[]{0.15F, 0.15F, 0.15F, 0.15F}, offset);
                     } else {
                         setColor(new float[]{1.0F, 1.0F, 1.0F, 1.0F}, offset);
                     }
@@ -110,11 +109,11 @@ public class RasterScan implements GLEventListener {
             }
         }
         gl.glDrawPixels(drawable.getSurfaceWidth(), drawable.getSurfaceHeight(), GL2.GL_RGBA, GL2.GL_FLOAT, FloatBuffer.wrap(RasterScan.colors));
-        if (!POINTS.isEmpty()) {
+        if (!points.isEmpty()) {
             gl.glPointSize(10.0F);
             gl.glBegin(GL2.GL_POINTS);
             gl.glColor4f(1.0F, 0.0F, 0.0F, 1.0F);
-            gl.glVertex2i(POINTS.get(POINTS.size() - 1).x, POINTS.get(POINTS.size() - 1).y);
+            gl.glVertex2i(points.get(points.size() - 1).x, points.get(points.size() - 1).y);
             gl.glEnd();
         }
     }
