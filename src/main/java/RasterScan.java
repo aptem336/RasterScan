@@ -18,6 +18,7 @@ import java.util.List;
 public class RasterScan implements GLEventListener, MouseListener {
 
     private final List<Point> points = new ArrayList<>();
+    //Q framebuffer?
     private float[] pixels;
 
     public static void main(String[] args) {
@@ -55,7 +56,7 @@ public class RasterScan implements GLEventListener, MouseListener {
     }
 
     public void display(GLAutoDrawable drawable) {
-        //Q framebuffer?
+        //TODO as clear color
         Arrays.fill(pixels, 0.15F);
         for (int i = 0; i < points.size(); i++) {
             Point a = points.get(i);
