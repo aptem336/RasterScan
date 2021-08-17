@@ -75,8 +75,6 @@ public class RasterScan implements GLEventListener {
     }
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-        GL2 gl = drawable.getGL().getGL2();
-        gl.glOrthof(0, width, height, 0, 0, 1);
         pixels = new float[drawable.getSurfaceWidth() * drawable.getSurfaceHeight() * 3];
     }
 
@@ -106,14 +104,6 @@ public class RasterScan implements GLEventListener {
         }
         GL2 gl = drawable.getGL().getGL2();
         gl.glDrawPixels(drawable.getSurfaceWidth(), drawable.getSurfaceHeight(), GL2.GL_RGB, GL2.GL_FLOAT, FloatBuffer.wrap(pixels));
-        //Q by pixels?
-        if (!points.isEmpty()) {
-            gl.glPointSize(10.0F);
-            gl.glBegin(GL2.GL_POINTS);
-            gl.glColor3f(1.0F, 0.0F, 0.0F);
-            gl.glVertex2i(points.get(points.size() - 1).x, points.get(points.size() - 1).y);
-            gl.glEnd();
-        }
     }
 
 
