@@ -12,7 +12,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class RasterScan implements GLEventListener, MouseListener {
@@ -20,6 +19,8 @@ public class RasterScan implements GLEventListener, MouseListener {
     private final List<Point> points = new ArrayList<>();
     //TODO framebuffer?
     private float[] pixels;
+    private float[] fillColor = new float[]{1.0F, 1.0F, 1.0F};
+    private float[] clearColor = new float[]{0.15F, 0.15F, 0.15F};
 
     public static void main(String[] args) {
         JFrame frame = new JFrame();
@@ -56,12 +57,12 @@ public class RasterScan implements GLEventListener, MouseListener {
     }
 
     public void display(GLAutoDrawable drawable) {
-        //TODO as clear color
-        Arrays.fill(pixels, 0.15F);
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] = clearColor[i % 3];
+        }
         for (int i = 0; i < points.size(); i++) {
             Point a = points.get(i);
             Point b = points.get((i + 1) % points.size());
-            //TODO optimize?
             if (a.y > b.y) {
                 a = points.get((i + 1) % points.size());
                 b = points.get(i);
@@ -82,12 +83,17 @@ public class RasterScan implements GLEventListener, MouseListener {
     }
 
     private void invertColor(int offset) {
-        //TODO extract colors
-        if (pixels[offset] == 1.0F && pixels[offset + 1] == 1.0F && pixels[offset + 2] == 1.0F) {
-            System.arraycopy(new float[]{0.15F, 0.15F, 0.15F}, 0, pixels, offset, 3);
+        if (pixels[offset] == fillColor[1]
+                && pixels[offset + 1] == fillColor[1]
+                && pixels[offset + 2] == fillColor[2]) {
+            fillPixel(offset, clearColor);
         } else {
-            System.arraycopy(new float[]{1.0F, 1.0F, 1.0F}, 0, pixels, offset, 3);
+            fillPixel(offset, fillColor);
         }
+    }
+
+    private void fillPixel(int offset, float[] color) {
+        System.arraycopy(color, 0, pixels, offset, 3);
     }
 
     @Override
