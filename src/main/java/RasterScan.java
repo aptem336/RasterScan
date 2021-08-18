@@ -16,11 +16,11 @@ import java.util.List;
 
 public class RasterScan implements GLEventListener, MouseListener {
 
+    private final float[] borderColor = new float[]{1.0F, 0.0F, 0.0F};
+    private final float[] fillColor = new float[]{1.0F, 1.0F, 1.0F};
+    private final float[] clearColor = new float[]{0.15F, 0.15F, 0.15F};
     private final List<Point> points = new ArrayList<>();
-    //TODO framebuffer?
     private float[] pixels;
-    private float[] fillColor = new float[]{1.0F, 1.0F, 1.0F};
-    private float[] clearColor = new float[]{0.15F, 0.15F, 0.15F};
 
     public static void main(String[] args) {
         JFrame frame = new JFrame();
@@ -72,6 +72,43 @@ public class RasterScan implements GLEventListener, MouseListener {
                 for (int j = x; j < drawable.getSurfaceWidth(); j++) {
                     invertColor((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 3 + j * 3);
                 }
+            }
+            int dx = b.x - a.x;
+            int dy = b.y - a.y;
+            int signX = Integer.compare(dx, 0);
+            int signY = Integer.compare(dy, 0);
+            if (dx < 0) dx = -dx;
+            if (dy < 0) dy = -dy;
+            int pdx;
+            int pdy;
+            int es;
+            int el;
+            if (dx > dy) {
+                pdx = signX;
+                pdy = 0;
+                es = dy;
+                el = dx;
+            } else {
+                pdx = 0;
+                pdy = signY;
+                es = dx;
+                el = dy;
+            }
+            int x = a.x;
+            int y = a.y;
+            int err = el / 2;
+            fillPixel((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 3 + x * 3, borderColor);
+            for (int t = 0; t < el; t++) {
+                err -= es;
+                if (err < 0) {
+                    err += el;
+                    x += signX;
+                    y += signY;
+                } else {
+                    x += pdx;
+                    y += pdy;
+                }
+                fillPixel((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 3 + x * 3, borderColor);
             }
         }
         GL2 gl = drawable.getGL().getGL2();
