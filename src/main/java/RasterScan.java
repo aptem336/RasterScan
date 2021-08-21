@@ -138,7 +138,8 @@ public class RasterScan implements GLEventListener, MouseListener {
     private void invertColor(int offset) {
         if (pixels[offset] == fillColor[0]
                 && pixels[offset + 1] == fillColor[1]
-                && pixels[offset + 2] == fillColor[2]) {
+                && pixels[offset + 2] == fillColor[2]
+                && pixels[offset + 3] == fillColor[3]) {
             fillPixel(offset, clearColor);
         } else {
             fillPixel(offset, fillColor);
