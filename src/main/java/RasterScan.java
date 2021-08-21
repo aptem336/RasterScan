@@ -18,8 +18,8 @@ import java.util.List;
 public class RasterScan implements GLEventListener, MouseListener {
 
     private final float[] borderColor = new float[]{1.0F, 0.0F, 0.0F, 1.0F};
-    private final float[] fillColor = new float[]{1.0F, 0.0F, 0.0F, 1.0F};
-    private final float[] clearColor = new float[]{0.15F, 0.15F, 0.15F, 1.0F};
+    private final float[] fillColor = new float[]{0.0F, 0.0F, 1.0F, 1.0F};
+    private final float[] clearColor = new float[]{0.0F, 0.0F, 0.0F, 1.0F};
     private final List<Point> points = new ArrayList<>();
     private float[] pixels;
 
@@ -75,7 +75,7 @@ public class RasterScan implements GLEventListener, MouseListener {
             }
             for (int y = a.y; y < b.y; y++) {
                 int x = a.x + ((y - a.y) * (b.x - a.x)) / (b.y - a.y);
-                for (int j = x; j < drawable.getSurfaceWidth(); j++) {
+                for (int j = x + 1; j < drawable.getSurfaceWidth(); j++) {
                     invertColor((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 4 + j * 4);
                 }
             }
@@ -83,44 +83,44 @@ public class RasterScan implements GLEventListener, MouseListener {
         for (int i = 0; i < points.size(); i++) {
             Point a = points.get(i);
             Point b = points.get((i + 1) % points.size());
-            int I = 16;
-            int x = b.x;
-            int y = b.y;
-            int dx = a.x - b.x;
-            int dy = a.y - b.y;
-            int sx = Integer.compare(dx, 0);
-            int sy = Integer.compare(dy, 0);
+            float I = 16;
+            float dx = b.x - a.x;
+            float dy = b.y - a.y;
+            float sx = Math.signum(dx);
+            float sy = Math.signum(dy);
             dx = Math.abs(dx);
             dy = Math.abs(dy);
-            float m = (float) dy / dx;
-            boolean flag = false;
+            float m = dy / dx;
+            boolean swap = false;
             if (m > 1) {
-                int temp = dx;
+                float p = dx;
                 dx = dy;
-                dy = temp;
-                m = 1.0F / m;
-                flag = true;
+                dy = p;
+                m = 1 / m;
+                swap = true;
             }
+            float e = I / 2;
+            float x = a.x;
+            float y = a.y;
             m *= I;
-            float f = I / 2.0F;
             float w = I - m;
-            borderColor[3] = f / I;
-            fillPixel((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 4 + x * 4, borderColor);
-            for (int j = 1; j < dx; j++) {
-                if (f < w) {
-                    if (flag) {
-                        y = y + sy;
+            borderColor[3] = e / I;
+            fillPixel((int) ((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 4 + x * 4), borderColor);
+            for (int j = 1; j <= dx; j++) {
+                if (e < w) {
+                    if (swap) {
+                        y += sy;
                     } else {
-                        x = x + sx;
+                        x += sx;
                     }
-                    f = f + m;
+                    e += m;
                 } else {
-                    x = x + sx;
-                    y = y + sy;
-                    f = f - w;
+                    x += sx;
+                    y += sy;
+                    e -= w;
                 }
-                borderColor[3] = f / I;
-                fillPixel((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 4 + x * 4, borderColor);
+                borderColor[3] = e / I;
+                fillPixel((int) ((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 4 + x * 4), borderColor);
             }
         }
         gl.glDrawPixels(drawable.getSurfaceWidth(), drawable.getSurfaceHeight(), GL2.GL_RGBA, GL2.GL_FLOAT, FloatBuffer.wrap(pixels));
