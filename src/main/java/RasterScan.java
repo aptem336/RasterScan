@@ -17,8 +17,8 @@ import java.util.Stack;
 public class RasterScan implements GLEventListener, MouseListener {
 
     private final float[] borderColor = new float[]{1.0F, 0.0F, 0.0F, 1.0F};//цвет границы
-    private final float[] fillColor = new float[]{0.0F, 0.0F, 1.0F, 1.0F};//цвет заливки
-    private final float[] clearColor = new float[]{0.0F, 0.0F, 0.0F, 1.0F};//цвет фона
+    private final float[] fillColor = new float[]{0.0F, 0.0F, 0.0F, 1.0F};//цвет фона
+    private final float[] clearColor = new float[]{0.0F, 0.0F, 1.0F, 1.0F};//цвет заливки
     private final List<Point> points = new ArrayList<>();//массив точек
     private float[] pixels;//массив цветовых компонент всех пикселей
     private GLDrawable drawable;
