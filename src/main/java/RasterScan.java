@@ -83,7 +83,29 @@ public class RasterScan implements GLEventListener, MouseListener {
         if (points.size() > 2) {
             fill(points.get(0));
         }
+        for (int x = 1; x < drawable.getSurfaceWidth() - 1; x++) {
+            for (int y = 1; y < drawable.getSurfaceHeight() - 1; y++) {
+                float[] color = sumColor(new float[]{pixels[toOffset(x - 1, y + 1)], pixels[toOffset(x - 1, y + 1) + 1], pixels[toOffset(x - 1, y + 1) + 2], pixels[toOffset(x - 1, y + 1) + 3]},
+                        sumColor(new float[]{pixels[toOffset(x, y + 1)], pixels[toOffset(x, y + 1) + 1], pixels[toOffset(x, y + 1) + 2], pixels[toOffset(x, y + 1) + 3]},
+                                sumColor(new float[]{pixels[toOffset(x + 1, y + 1)], pixels[toOffset(x + 1, y + 1) + 1], pixels[toOffset(x + 1, y + 1) + 2], pixels[toOffset(x + 1, y + 1) + 3]},
+                                        sumColor(new float[]{pixels[toOffset(x, y)], pixels[toOffset(x, y) + 1], pixels[toOffset(x, y) + 2], pixels[toOffset(x, y) + 3]},
+                                                sumColor(new float[]{pixels[toOffset(x - 1, y)], pixels[toOffset(x - 1, y) + 1], pixels[toOffset(x - 1, y) + 2], pixels[toOffset(x - 1, y) + 3]},
+                                                        sumColor(new float[]{pixels[toOffset(x - 1, y - 1)], pixels[toOffset(x - 1, y - 1) + 1], pixels[toOffset(x - 1, y - 1) + 2], pixels[toOffset(x - 1, y - 1) + 3]},
+                                                                sumColor(new float[]{pixels[toOffset(x, y - 1)], pixels[toOffset(x, y - 1) + 1], pixels[toOffset(x, y - 1) + 2], pixels[toOffset(x, y - 1) + 3]},
+                                                                        sumColor(new float[]{pixels[toOffset(x + 1, y - 1)], pixels[toOffset(x + 1, y - 1) + 1], pixels[toOffset(x + 1, y - 1) + 2], pixels[toOffset(x + 1, y - 1) + 3]},
+                                                                                new float[]{pixels[toOffset(x + 1, y)], pixels[toOffset(x + 1, y) + 1], pixels[toOffset(x + 1, y) + 2], pixels[toOffset(x + 1, y) + 3]}))))))));
+                color[0] /= 9;
+                color[1] /= 9;
+                color[2] /= 9;
+                color[3] /= 9;
+                fillPixel(x, y, color);
+            }
+        }
         gl.glDrawPixels(drawable.getSurfaceWidth(), drawable.getSurfaceHeight(), GL2.GL_RGBA, GL2.GL_FLOAT, FloatBuffer.wrap(pixels));
+    }
+
+    private float[] sumColor(float[] a, float[] b) {
+        return new float[]{a[0] + b[0], a[1] + b[1], a[2] + b[2], a[3] + b[3]};
     }
 
     private void fill(Point start) {
