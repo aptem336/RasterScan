@@ -73,6 +73,55 @@ public class RasterScan implements GLEventListener, MouseListener {
         for (int i = 0; i < pixels.length; i++) {
             pixels[i] = clearColor[i % 4];
         }
+        for (int i = 0; i < points.size(); i++) {
+            bresenham(points.get(i).x, points.get(i).y,
+                    points.get((i + 1) % points.size()).x, points.get((i + 1) % points.size()).y,
+                    drawable);
+        }
+        gl.glDrawPixels(drawable.getSurfaceWidth(), drawable.getSurfaceHeight(), GL2.GL_RGBA, GL2.GL_FLOAT, FloatBuffer.wrap(pixels));
+    }
+
+   private void bresenham(int x1, int y1,
+                          int x2, int y2,
+                          GLAutoDrawable drawable) {
+        int x = x1, y = y1,
+                dx = Math.abs(x2 - x1),
+                dy = Math.abs(y2 - y1),
+                s1 = x1 < x2 ? 1 : -1,
+                s2 = y1 < y2 ? 1 : -1;
+
+        boolean changed = true;
+        if (dy > dx) {
+            int temp = dx;
+            dx = dy;
+            dy = temp;
+        } else {
+            changed = false;
+        }
+
+        int e = 2 * dy - dx;
+        for (int i = 1; i <= dx; i++) {
+            fillPixel((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 4 + (x + s1) * 4, borderColor);
+            while (e >= 0) {
+                if (changed) {
+                    x += s1;
+                } else {
+                    y += s2;
+                }
+                e -= 2 * dx;
+            }
+            if (changed) {
+                y += s2;
+            } else {
+                x += s1;
+            }
+            e += 2 * dy;
+        }
+    }
+
+    private void fillPixel(int offset, float[] color) {
+        //копируем массив цветовых компонент определённого пикселя
+        System.arraycopy(color, 0, pixels, offset, 4);
     }
 
 
