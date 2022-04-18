@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class RasterScan implements GLEventListener, MouseListener {
 
@@ -63,7 +64,7 @@ public class RasterScan implements GLEventListener, MouseListener {
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
         this.drawable = drawable;
         //инициализация массива цветовых компонент пикселей при изменении размеров окна в т.ч. при инициализации
-        pixels = new float[drawable.getSurfaceWidth() * drawable.getSurfaceHeight() * 4];
+        pixels = new float[(drawable.getSurfaceWidth() + 1) * (drawable.getSurfaceHeight() + 1) * 4];
     }
 
     public void display(GLAutoDrawable drawable) {
@@ -79,7 +80,108 @@ public class RasterScan implements GLEventListener, MouseListener {
             bresenham(points.get(i).x, points.get(i).y,
                     points.get((i + 1) % points.size()).x, points.get((i + 1) % points.size()).y);
         }
+        if (points.size() > 2) {
+            fill(points.get(0));
+        }
         gl.glDrawPixels(drawable.getSurfaceWidth(), drawable.getSurfaceHeight(), GL2.GL_RGBA, GL2.GL_FLOAT, FloatBuffer.wrap(pixels));
+    }
+
+    private void fill(Point start) {
+        Stack<Point> stack = new Stack<>();
+        stack.push(start);
+        while (!stack.empty()) {
+            Point pixel = stack.pop();
+            fillPixel(pixel.x, pixel.y, fillColor);
+            int tmp_x = pixel.x;
+            int x = pixel.x + 1, y = pixel.y;
+            while (x < drawable.getSurfaceWidth() && !is_countour(x, y)) {
+                fillPixel(x, y, fillColor);
+                x++;
+            }
+
+            int right_x = x - 1;
+            x = tmp_x;
+            x--;
+            while (x >= 0 && !is_countour(x, y)) {
+                fillPixel(x, y, fillColor);
+                x--;
+            }
+            int left_x = ++x;
+
+            y++;
+            if (y < drawable.getSurfaceHeight()) {
+                while (x <= right_x) {
+                    boolean flag = false;
+                    while (!is_countour(x, y) && !is_inner(x, y) && x < right_x) {
+                        if (!flag) {
+                            flag = true;
+                        }
+                        x++;
+                    }
+
+                    if (flag) {
+                        if (x == right_x && !is_countour(x, y) && !is_inner(x, y)) {
+                            stack.push(new Point(x, y));
+                        } else {
+                            stack.push(new Point(x - 1, y));
+                        }
+                        flag = false;
+                    }
+
+                    float in_x = x;
+                    while ((is_countour(x, y) || is_inner(x, y)) && x < right_x) {
+                        x++;
+                    }
+
+                    if (in_x == x)
+                        x++;
+                }
+            }
+            x = left_x;
+            y -= 2;
+            if (y >= 0) {
+                while (x <= right_x) {
+                    boolean flag = false;
+                    while (!is_countour(x, y) && !is_inner(x, y) && x < right_x) {
+                        if (!flag) {
+                            flag = true;
+                        }
+                        x++;
+                    }
+
+                    if (flag) {
+                        if (x == right_x && !is_countour(x, y) && !is_inner(x, y)) {
+                            stack.push(new Point(x, y));
+                        } else {
+                            stack.push(new Point(x - 1, y));
+                        }
+                        flag = false;
+                    }
+
+                    int in_x = x;
+                    while ((is_countour(x, y) || is_inner(x, y)) && x < right_x) {
+                        x++;
+                    }
+
+                    if (in_x == x)
+                        x++;
+                }
+            }
+        }
+    }
+
+    private boolean is_inner(int x, int y) {
+        return pixels[toOffset(x, y)] == fillColor[0]
+                && pixels[toOffset(x, y) + 1] == fillColor[1]
+                && pixels[toOffset(x, y) + 2] == fillColor[2]
+                && pixels[toOffset(x, y) + 3] == fillColor[3];
+    }
+
+    private boolean is_countour(int x, int y) {
+        return pixels[toOffset(x, y)] == borderColor[0]
+                && pixels[toOffset(x, y) + 1] == borderColor[1]
+                && pixels[toOffset(x, y) + 2] == borderColor[2]
+                && pixels[toOffset(x, y) + 3] == borderColor[3];
     }
 
     private void bresenham(int x1, int y1,
