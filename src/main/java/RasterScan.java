@@ -1,7 +1,5 @@
-import com.jogamp.opengl.GL;
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLEventListener;
+import com.jogamp.nativewindow.NativeSurface;
+import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.util.Animator;
 
@@ -22,6 +20,7 @@ public class RasterScan implements GLEventListener, MouseListener {
     private final float[] clearColor = new float[]{0.0F, 0.0F, 0.0F, 1.0F};//цвет фона
     private final List<Point> points = new ArrayList<>();//массив точек
     private float[] pixels;//массив цветовых компонент всех пикселей
+    private GLDrawable drawable;
 
     public static void main(String[] args) {
         //инициализация фрейма
@@ -54,6 +53,7 @@ public class RasterScan implements GLEventListener, MouseListener {
     }
 
     public void init(GLAutoDrawable drawable) {
+        this.drawable = drawable;
         GL2 gl = drawable.getGL().getGL2();
         //включение смешивания и его функции (для прозрачности)
         gl.glEnable(GL2.GL_BLEND);
@@ -61,11 +61,13 @@ public class RasterScan implements GLEventListener, MouseListener {
     }
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+        this.drawable = drawable;
         //инициализация массива цветовых компонент пикселей при изменении размеров окна в т.ч. при инициализации
         pixels = new float[drawable.getSurfaceWidth() * drawable.getSurfaceHeight() * 4];
     }
 
     public void display(GLAutoDrawable drawable) {
+        this.drawable = drawable;
         GL2 gl = drawable.getGL().getGL2();
         //очистка цветового буффера
         gl.glClear(GL.GL_COLOR_BUFFER_BIT);
@@ -75,15 +77,13 @@ public class RasterScan implements GLEventListener, MouseListener {
         }
         for (int i = 0; i < points.size(); i++) {
             bresenham(points.get(i).x, points.get(i).y,
-                    points.get((i + 1) % points.size()).x, points.get((i + 1) % points.size()).y,
-                    drawable);
+                    points.get((i + 1) % points.size()).x, points.get((i + 1) % points.size()).y);
         }
         gl.glDrawPixels(drawable.getSurfaceWidth(), drawable.getSurfaceHeight(), GL2.GL_RGBA, GL2.GL_FLOAT, FloatBuffer.wrap(pixels));
     }
 
-   private void bresenham(int x1, int y1,
-                          int x2, int y2,
-                          GLAutoDrawable drawable) {
+    private void bresenham(int x1, int y1,
+                           int x2, int y2) {
         int x = x1, y = y1,
                 dx = Math.abs(x2 - x1),
                 dy = Math.abs(y2 - y1),
@@ -101,7 +101,7 @@ public class RasterScan implements GLEventListener, MouseListener {
 
         int e = 2 * dy - dx;
         for (int i = 1; i <= dx; i++) {
-            fillPixel((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() * 4 + (x + s1) * 4, borderColor);
+            fillPixel(x, y, borderColor);
             while (e >= 0) {
                 if (changed) {
                     x += s1;
@@ -119,9 +119,13 @@ public class RasterScan implements GLEventListener, MouseListener {
         }
     }
 
-    private void fillPixel(int offset, float[] color) {
+    private void fillPixel(int x, int y, float[] color) {
         //копируем массив цветовых компонент определённого пикселя
-        System.arraycopy(color, 0, pixels, offset, 4);
+        System.arraycopy(color, 0, pixels, toOffset(x, y), 4);
+    }
+
+    private int toOffset(int x, int y) {
+        return ((drawable.getSurfaceHeight() - y) * drawable.getSurfaceWidth() + x) * 4;
     }
 
 
